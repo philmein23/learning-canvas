@@ -24,6 +24,16 @@ canvas.height = innerHeight;
 // context.strokeStyle = "red";
 // context.stroke();
 
+let mouse = {
+  x: null,
+  y: null
+};
+
+window.addEventListener("mousemove", e => {
+  mouse.x = e.x;
+  mouse.y = e.y;
+});
+
 function createCircle(x, y, dx, dy, radius, stroke) {
   return {
     x,
@@ -33,20 +43,31 @@ function createCircle(x, y, dx, dy, radius, stroke) {
     radius,
     draw() {
       context.beginPath();
-      context.arc(x, y, radius, 0, Math.PI * 2, false);
+      context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
       context.strokeStyle = stroke;
       context.stroke();
+      context.fill();
     },
     update() {
-      if (x + radius > innerWidth || x - radius < 0) {
-        dx = -dx;
+      if (this.x + this.radius > innerWidth || this.x - this.radius < 0) {
+        this.dx = -this.dx;
       }
-      if (y + radius > innerHeight || y - radius < 0) {
-        dy = -dy;
+      if (this.y + this.radius > innerHeight || this.y - this.radius < 0) {
+        this.dy = -this.dy;
       }
 
-      x += dx;
-      y += dy;
+      this.x += this.dx;
+      this.y += this.dy;
+
+      let isXwithinDistance = mouse.x - this.x < 50 && mouse.x - this.x > -50;
+      let isYwithinDistance = mouse.y - this.y < 50 && mouse.y - this.y > -50;
+      if (isXwithinDistance && isYwithinDistance) {
+        if (this.radius < 40) {
+          this.radius += 1;
+        }
+      } else if (this.radius > 2) {
+        this.radius -= 1;
+      }
 
       this.draw();
     }
@@ -56,11 +77,11 @@ function createCircle(x, y, dx, dy, radius, stroke) {
 let circlesArray = [];
 function generateRandomCircles(maxCircles = 20) {
   for (let i = 0; i <= maxCircles; i++) {
-    let radius = Math.random() * 200;
+    let radius = 30;
     let x = Math.random() * (innerWidth - 2 * radius) + radius;
     let y = Math.random() * (innerHeight - 2 * radius) + radius;
-    let dx = (Math.random() - 0.5) * 8;
-    let dy = (Math.random() - 0.5) * 8;
+    let dx = (Math.random() - 0.5) * 2;
+    let dy = (Math.random() - 0.5) * 2;
     let r = Math.random() * 255;
     let g = Math.random() * 255;
     let b = Math.random() * 255;
@@ -71,7 +92,7 @@ function generateRandomCircles(maxCircles = 20) {
   }
 }
 
-generateRandomCircles(100);
+generateRandomCircles(200);
 
 function animate() {
   requestAnimationFrame(animate);
