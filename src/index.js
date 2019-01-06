@@ -9,43 +9,30 @@ let innerHeight = window.innerHeight;
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-// context.fillStyle = "rgba(221, 143, 131, 0.9)";
-// context.fillRect(50, 100, 200, 200);
-// context.fillStyle = "rgba(230, 123, 131, 0.9)";
-// context.fillRect(400, 400, 200, 200);
-// context.fillStyle = "rgba(221, 180, 131, 0.9)";
-// context.fillRect(300, 800, 200, 200);
-
-// context.beginPath();
-// context.moveTo(200, 100);
-// context.lineTo(900, 400);
-// context.lineTo(1000, 400);
-// context.lineTo(1200, 600);
-// context.strokeStyle = "red";
-// context.stroke();
-
 let mouse = {
   x: null,
   y: null
 };
+
+let colorArray = ["#393E46", "#00ADB5", "#FFF4E0", "#F8B500", "#FC3C3C"];
 
 window.addEventListener("mousemove", e => {
   mouse.x = e.x;
   mouse.y = e.y;
 });
 
-function createCircle(x, y, dx, dy, radius, stroke) {
+function createCircle(x, y, dx, dy, radius, fillStyle) {
   return {
     x,
     y,
     dx,
     dy,
     radius,
+    minRadius: radius,
     draw() {
       context.beginPath();
       context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-      context.strokeStyle = stroke;
-      context.stroke();
+      context.fillStyle = fillStyle;
       context.fill();
     },
     update() {
@@ -62,10 +49,10 @@ function createCircle(x, y, dx, dy, radius, stroke) {
       let isXwithinDistance = mouse.x - this.x < 50 && mouse.x - this.x > -50;
       let isYwithinDistance = mouse.y - this.y < 50 && mouse.y - this.y > -50;
       if (isXwithinDistance && isYwithinDistance) {
-        if (this.radius < 40) {
-          this.radius += 1;
+        if (this.radius < 60) {
+          this.radius += 2;
         }
-      } else if (this.radius > 2) {
+      } else if (this.radius > this.minRadius) {
         this.radius -= 1;
       }
 
@@ -77,22 +64,19 @@ function createCircle(x, y, dx, dy, radius, stroke) {
 let circlesArray = [];
 function generateRandomCircles(maxCircles = 20) {
   for (let i = 0; i <= maxCircles; i++) {
-    let radius = 30;
+    let radius = Math.random() * 3 + 1;
     let x = Math.random() * (innerWidth - 2 * radius) + radius;
     let y = Math.random() * (innerHeight - 2 * radius) + radius;
-    let dx = (Math.random() - 0.5) * 2;
-    let dy = (Math.random() - 0.5) * 2;
-    let r = Math.random() * 255;
-    let g = Math.random() * 255;
-    let b = Math.random() * 255;
+    let dx = (Math.random() - 0.5) * 3;
+    let dy = (Math.random() - 0.5) * 3;
 
-    let stroke = `rgba(${r}, ${g}, ${b}, 1)`;
+    let fillStyle = colorArray[Math.floor(Math.random() * colorArray.length)];
 
-    circlesArray.push(createCircle(x, y, dx, dy, radius, stroke));
+    circlesArray.push(createCircle(x, y, dx, dy, radius, fillStyle));
   }
 }
 
-generateRandomCircles(200);
+generateRandomCircles(800);
 
 function animate() {
   requestAnimationFrame(animate);
